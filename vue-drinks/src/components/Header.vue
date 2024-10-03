@@ -2,13 +2,23 @@
     import { computed } from 'vue'
     import { RouterLink, useRoute } from 'vue-router'
     import { useDrinksStore } from '../stores/drinks'
+    import { useNotificationStore } from '@/stores/notifications';
 
     const route = useRoute()
     const store = useDrinksStore();
+    const notification = useNotificationStore();
 
     const homePage = computed(() => route.name === 'home')
 
     const handleSubmit = () => {
+
+        if(Object.values(store.search).includes('')) {
+            notification.text = 'Todos los campos son obligatorios';
+            notification.show = true;
+            notification.error = true;
+            return;
+
+        }
         store.getRecipe();
     }
 
@@ -41,14 +51,14 @@
                     <label for="ingrediente" class="text-white block uppercase font-extrabold text-lg">
                         Nombre o Ingrediente
                     </label>
-                    <input type="text" name="" id="ingrediente" class="p-3 w-full focus:outline-none" placeholder="Ej. voka, limón, tequila" v-model="store.name">
+                    <input type="text" name="" id="ingrediente" class="p-3 w-full focus:outline-none" placeholder="Ej. voka, limón, tequila" v-model="store.search.name">
                 </div>
 
                 <div class="space-y-4">
                     <label for="categoria" class="text-white block uppercase font-extrabold text-lg">
                         Categoria
                     </label>
-                    <select id="categoria" class="p-3 w-full focus:outline-none text-black" v-model="store.category">
+                    <select id="categoria" class="p-3 w-full focus:outline-none text-black" v-model="store.search.category">
                         <option value="">-- Elegir --</option>
                         <option v-for="category in store.categories" :key="category.strCategory" :value="category.strCategory">
                             {{ category.strCategory }}
